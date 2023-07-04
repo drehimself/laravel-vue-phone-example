@@ -4,7 +4,9 @@ import InputError from '@/Components/InputError.vue'
 import InputLabel from '@/Components/InputLabel.vue'
 import PrimaryButton from '@/Components/PrimaryButton.vue'
 import TextInput from '@/Components/TextInput.vue'
+import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import { Head, Link, useForm } from '@inertiajs/vue3'
+import { ref } from 'vue'
 
 const form = useForm({
   name: '',
@@ -14,7 +16,13 @@ const form = useForm({
   password_confirmation: '',
 })
 
+const results = ref()
+
 const submit = () => {
+  if (!results.value.isValid) {
+    return alert('Frontend invalid phone number')
+  }
+
   form.post(route('register'), {
     onFinish: () => form.reset('password', 'password_confirmation'),
   })
@@ -60,6 +68,24 @@ const submit = () => {
       <div class="mt-4">
         <InputLabel for="phone" value="Phone Number" />
 
+        <MazPhoneNumberInput
+          v-model="form.phone"
+          show-code-on-list
+          color="primary"
+          :only-countries="['CA', 'US', 'PH']"
+          @update="results = $event"
+          :success="results?.isValid"
+          autocomplete="off"
+        />
+        <code>
+          {{ results }}
+        </code>
+
+        <InputError class="mt-2" :message="form.errors.phone" />
+      </div>
+      <!-- <div class="mt-4">
+        <InputLabel for="phone" value="Phone Number" />
+
         <TextInput
           id="phone"
           type="text"
@@ -70,7 +96,7 @@ const submit = () => {
         />
 
         <InputError class="mt-2" :message="form.errors.phone" />
-      </div>
+      </div> -->
 
       <div class="mt-4">
         <InputLabel for="password" value="Password" />
